@@ -1,17 +1,16 @@
 ﻿#include <iostream>
 #include <string>
-#include <cmath>
 #include <Windows.h>
 
 bool simple_string_hash() {
-	int temp = 0;
+	int hash = 0;
 	std::string entry;
 	std::cout << "Введите строку: ";
 	std::cin >> entry;
 	for (char i : entry) {
-		temp += static_cast<int>(abs(i));
+		hash += static_cast<int>(i);
 	}
-	std::cout << "Наивный хэш строки " << entry << " = " << temp << std::endl;
+	std::cout << "Наивный хэш строки " << entry << " = " << hash << std::endl;
 	if (entry == "exit") {
 		return false;
 	}
