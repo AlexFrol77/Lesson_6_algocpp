@@ -3,39 +3,46 @@
 #include <cmath>
 #include <Windows.h>
 
-std::string request_str_temp() {
+std::string request_source_str() {
 	std::string source_str;
 	std::cout << "Введите строку, в которой будет осуществляться поиск: ";
 	std::cin >> source_str;
 	return source_str;
 }
 
-std::string request_str_find() {
+std::string request_find_str() {
 	std::string str_find;
 	std::cout << "Введите подстроку, которую нужно найти: ";
 	std::cin >> str_find;
 	return str_find;
 }
 
-int search_str(std::string source_str, std::string find_str, int s_size, int f_size) {
-	long long find_hash = 0,
-			  source_hash = 0;
-	int p = 256,
-		n = 1001,
-		mult = 1;
-	for (int i = 0; i < source_str.size() - f_size; i++) {
-		if (i == 0) {
-			for (int j = 0; j < f_size - 1; j++) {
-				find_hash += ((find_hash * p + static_cast<int>(find_str[j])) % n);
-				source_hash += ((source_hash * p + static_cast<int>(source_str[j])) % n);
-			}
-		}
-		else {
-			source_hash -= (static_cast<int>(source_str[i - 1]) % n);
-			source_hash += ((source_hash * (long long)pow(p, (f_size - 1)) + static_cast<int>(source_str[i + (f_size - 1)]))) % n;
-				
-		}
-		if (find_hash == source_hash) {
+int get_hash(std::string text, int start, int finish) {
+
+	int text_size = text.size();
+		
+	int b = 13,
+		q = 256,
+		result = 0;
+
+	for (int i = start; i < finish; i++) {
+		result = (b * result + static_cast<int>(text[i])) % q;
+	}
+	return result;
+}
+
+int search_str(std::string source_str, std::string find_str) {
+	int s_size = source_str.size(),
+		f_size = find_str.size();
+		
+	int s_hash = 0,
+		f_hash = 0;
+
+	f_hash = get_hash(find_str, 0, f_size - 1);
+
+	for (int i = 0; i < s_size - f_size; i++) {
+		s_hash = get_hash(source_str, i, i + (f_size - 1));
+		if (s_hash == f_hash) {
 			return i;
 		}
 	}
@@ -47,20 +54,20 @@ int main(int argc, char** argv) {
 	SetConsoleCP(1251);
 	SetConsoleOutputCP(1251);
 
-	std::string find_str = "ohel",
-		source_str = "hellohelomydearfriendhello";
+	std::string find_str,
+				source_str;
 
-	int hash_find,
-		find_size = find_str.size(),
-		source_size = source_str.size();
+	source_str = request_source_str();
+	do {	
+		find_str = request_find_str();
+		int i = search_str(source_str, find_str);
+		if (i >= 0) {
+			std::cout << "Подстрока " << find_str << " найдена по индексу " << i << std::endl;
+		}
+		else {
+			std::cout << "Подстрока " << find_str << " не найдена " << std::endl;
+		}
+	} while (find_str != "exit");
 
-	
-	int i = search_str(source_str, find_str, source_size, find_size);
-	if (i >= 0) {
-		std::cout << "Подстрока " << find_str << " найдена по индексу " << i << std::endl;
-	}
-	else {
-		std::cout << "Подстрока " << find_str << " не найдена " << std::endl;
-	}
 	return 0;
 }
