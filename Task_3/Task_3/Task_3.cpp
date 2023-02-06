@@ -1,6 +1,5 @@
 ﻿#include <iostream>
 #include <string>
-#include <cmath>
 #include <Windows.h>
 
 std::string request_source_str() {
@@ -17,33 +16,42 @@ std::string request_find_str() {
 	return str_find;
 }
 
-int get_hash(std::string text, int start, int finish) {
-
-	int text_size = text.size();
+unsigned long get_hash(std::string text, int start, int finish) {
 		
 	int b = 13,
-		q = 256,
-		result = 0;
+		q = 256;
+	unsigned long mult = 1,
+				  hash = 0;
 
 	for (int i = start; i < finish; i++) {
-		result = (b * result + static_cast<int>(text[i])) % q;
+		hash += ((mult * static_cast<int>(text[i])) % q);
+		mult = mult * b;
 	}
-	return result;
+	return hash;
 }
 
 int search_str(std::string source_str, std::string find_str) {
+
 	int s_size = source_str.size(),
 		f_size = find_str.size();
 		
-	int s_hash = 0,
-		f_hash = 0;
+	unsigned long s_hash = 0,
+				  f_hash = 0;
 
 	f_hash = get_hash(find_str, 0, f_size - 1);
 
-	for (int i = 0; i < s_size - f_size; i++) {
+	for (int i = 0; i < s_size - (f_size - 1); i++) {
 		s_hash = get_hash(source_str, i, i + (f_size - 1));
 		if (s_hash == f_hash) {
-			return i;
+			int count = 0;
+			for (int j = 0; j < f_size; j++) {
+				if (source_str[i + j] == find_str[j]) {
+					count++;
+				}				
+			}
+			if (count == f_size) {
+				return i;
+			}
 		}
 	}
 	return -1;
